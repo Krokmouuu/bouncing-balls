@@ -24,6 +24,8 @@ class Circle:
         self.gap_angle = gap_angle  # Position du trou dans le contour
         self.gap_size = gap_size  # Taille du trou
         self.rotation_speed = 0.02  # Vitesse de rotation en radians par frame
+        self.min_radius = 100  # Tu peux ajuster cette valeur
+        self.shrink_rate = 0.5  # Diminution du rayon à chaque frame
 
     def draw(self, screen):
         num_points = 60  # Nombre de points pour dessiner le cercle

@@ -3,6 +3,35 @@ from ball import Ball
 from circle import Circle
 from explosion import Explosion
 import random
+from colors import colors
+import argparse
+
+parser = argparse.ArgumentParser(description="Bouncing Ball Game")
+parser.add_argument(
+    "--ball_color",
+    type=str,
+    default="black",
+    help="Couleur de la balle (nom de couleur)",
+)
+parser.add_argument(
+    "--circle_color",
+    type=str,
+    default="white",
+    help="Couleur des cercles (nom de couleur)",
+)
+parser.add_argument(
+    "--explosion_color",
+    type=str,
+    default="red",
+    help="Couleur de l'explosion (nom de couleur)",
+)
+parser.add_argument(
+    "--balls",
+    type=str,
+    default="1",
+    help="Nombre de balle",
+)
+args = parser.parse_args()
 
 pygame.init()
 
@@ -12,12 +41,14 @@ screen.fill((0, 0, 0))
 clock = pygame.time.Clock()
 running = True
 
-TOTAL_FRAMES = 60 * 61
+TOTAL_FRAMES = 60 * 65
 
 position_ball_x = screen.get_width() // 2
 position_ball_y = screen.get_height() // 2
 radius_ball = 20
-color_ball = (0, 0, 0)
+color_ball = colors.get(
+    args.ball_color, (255, 255, 255)
+)  # Utilise la couleur spécifiée ou noir par défaut
 border_color_ball = (255, 255, 255)
 
 
@@ -43,6 +74,7 @@ position_circle_y = screen.get_height() // 2
 thickness = 5
 start_radius = 200
 number_of_circles = 40
+circle_color = colors.get(args.circle_color, (0, 0, 0))  # Couleur des cercles
 
 
 def generate_circles(number_of_circles, start_radius, gap):
@@ -55,11 +87,11 @@ def generate_circles(number_of_circles, start_radius, gap):
             position_circle_x,
             position_circle_y,
             radius,
-            (255, 255, 255),  # Couleur des cercles
+            circle_color,  # Couleur des cercles
             thickness,  # Épaisseur du contour
             start_angle,  # Angle de départ
-            gap_angle=0,
-            gap_size=0.5,
+            gap_angle=3,
+            gap_size=0.7,
         )
         circle.rotation_speed = rotation_speed
         circles.append(circle)
@@ -77,6 +109,9 @@ base_circle.min_radius = 100
 base_circle.shrink_rate = 0.1
 
 explosions = []
+explosion_color = colors.get(
+    args.explosion_color, (255, 0, 0)
+)  # Couleur des explosions
 
 for i in range(TOTAL_FRAMES):
     screen.fill((0, 0, 0))
@@ -105,13 +140,12 @@ for i in range(TOTAL_FRAMES):
     for circle in circles[:]:
         if circle.check_collision(ball):
             # Ajoute une explosion avant de supprimer le cercle
-            # Lorsque vous créez l'explosion, utilisez une couleur plus vive :
             explosions.append(
                 Explosion(
                     circle.x,
                     circle.y,
                     circle.radius,
-                    (255, 000, 000),  # Bleu plus clair et visible
+                    explosion_color,  # Bleu plus clair et visible
                 )
             )
             circles.remove(circle)
@@ -148,9 +182,31 @@ for i in range(TOTAL_FRAMES):
     for circle in circles:
         circle.draw(screen)
     ball.draw(screen)
-    ball.trail_positions.insert(0, (ball.x, ball.y))  
+    ball.trail_positions.insert(0, (ball.x, ball.y))
     if len(ball.trail_positions) > ball.max_trail_length:
-        ball.trail_positions.pop()  
+        ball.trail_positions.pop()
+
+    elapsed_time = (TOTAL_FRAMES - i) // 60
+    font = pygame.font.Font(None, 40)
+    minutes = elapsed_time // 60
+    seconds = elapsed_time % 60
+    timer_text = font.render(f"{minutes:02}:{seconds:02}", True, (0, 0, 0))
+    if elapsed_time <= 8:
+        shake_x = random.randint(-5, 5)  # Déplacement horizontal aléatoire
+        shake_y = random.randint(-5, 5)  # Déplacement vertical aléatoire
+    else:
+        shake_x = 0
+        shake_y = 0
+
+    timer_rect = pygame.Rect(
+        screen.get_width() // 2 - 30 + shake_x,  # Ajout du shake horizontal
+        screen.get_height() // 2 + 400 + shake_y,  # Ajout du shake vertical
+        90,
+        45,
+    )
+    pygame.draw.rect(screen, (255, 255, 255), timer_rect)
+    screen.blit(timer_text, (timer_rect.x + 10, timer_rect.y + 10))
+
     pygame.display.update()
 
 pygame.quit()

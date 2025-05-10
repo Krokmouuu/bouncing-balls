@@ -15,7 +15,7 @@ class Ball:
         self.velocity_y = 5
         self.gravity = 0.5
         self.bounce_factor = 1.27
-        self.max_speed = 15
+        self.max_speed = 13
         self.trail_positions = []
         self.max_trail_length = 15
 

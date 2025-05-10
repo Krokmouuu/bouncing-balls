@@ -76,20 +76,17 @@ class Circle:
         distance_sq = dx * dx + dy * dy
         effective_radius = self.radius - ball.radius
 
-        # Optimisation: vérifier d'abord si on est dans la zone de collision possible
+        # Optimisation
         if not (
             (effective_radius * 0.9) ** 2
             < distance_sq
             < (self.radius + ball.radius) ** 2
         ):
-            return
+            return False
 
         distance = math.sqrt(distance_sq)
 
-        # Angle de la balle par rapport au centre du cercle
         angle = math.atan2(dy, dx) % (2 * math.pi)
-
-        # Vérifier si la balle est dans la zone du trou (en tenant compte de la rotation)
         relative_angle = (angle - self.angle) % (2 * math.pi)
         gap_start = self.gap_angle
         gap_end = (gap_start + self.gap_size) % (2 * math.pi)
@@ -100,9 +97,9 @@ class Circle:
         else:
             in_gap = relative_angle >= gap_start or relative_angle <= gap_end
 
-        # Si la balle est dans le trou, pas de collision
+        # === DESTRUCTION SI DANS LE TROU ===
         if in_gap and distance > (self.radius - ball.radius * 1.8):
-            return
+            return True
 
         # Vérifier la collision avec le cercle extérieur
         if abs(distance - self.radius) < ball.radius * 1.1:
@@ -151,3 +148,5 @@ class Circle:
         # Mise à jour de la position précédente
         ball.prev_x = ball.x
         ball.prev_y = ball.y
+
+        return False

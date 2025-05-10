@@ -1,5 +1,5 @@
 import pygame
-
+import math
 class Ball:
     def __init__(self, x, y, radius, color, border_color=None, border_radius=None):
         self.x = x
@@ -13,7 +13,7 @@ class Ball:
         self.velocity_x = 5
         self.velocity_y = 5
         self.gravity = 0.5
-        self.bounce_factor = 1.0  # Facteur de rebond (1.0 = 100% de l'énergie conservée)
+        self.bounce_factor = 1.02  # un peu d'énergie en plus à chaque rebond
 
     def update(self, screen_width, screen_height):
         # Appliquer la gravité

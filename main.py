@@ -15,16 +15,10 @@ TOTAL_FRAMES = 60 * 61
 
 position_ball_x = screen.get_width() // 2
 position_ball_y = screen.get_height() // 2
-
-position_circle_x = screen.get_width() // 2
-position_circle_y = screen.get_height() // 2
-start_radius = 200
-
 radius_ball = 20
 color_ball = (0, 0, 255)
 border_color_ball = (255, 255, 255)
 
-number_of_circles = 5
 
 def reset_ball():
     return Ball(
@@ -35,6 +29,19 @@ def reset_ball():
         border_color_ball,
         radius_ball + 2,
     )
+
+
+ball = reset_ball()
+ball.prev_x = ball.x
+ball.prev_y = ball.y
+ball.x += ball.velocity_x
+ball.y += ball.velocity_y
+
+position_circle_x = screen.get_width() // 2
+position_circle_y = screen.get_height() // 2
+thickness = 5
+start_radius = 200
+number_of_circles = 10
 
 
 def generate_circles(number_of_circles, start_radius, gap):
@@ -48,7 +55,7 @@ def generate_circles(number_of_circles, start_radius, gap):
             position_circle_y,
             radius,
             (255, 0, 0),  # Couleur des cercles
-            5,  # Épaisseur du contour
+            thickness,  # Épaisseur du contour
             start_angle,  # Angle de départ
             gap_angle=0,
             gap_size=0.5,
@@ -58,15 +65,9 @@ def generate_circles(number_of_circles, start_radius, gap):
     return circles
 
 
-ball = reset_ball()
-ball.prev_x = ball.x
-ball.prev_y = ball.y
-ball.x += ball.velocity_x
-ball.y += ball.velocity_y
-
-gap_between_circles = 20  # Espace entre les cercles
+gap_between_circles = 30  # Espace entre les cercles
 circles = generate_circles(number_of_circles, start_radius, gap_between_circles)
-
+circles_to_remove = []
 
 for i in range(TOTAL_FRAMES):
     clock.tick(60)
@@ -92,17 +93,18 @@ for i in range(TOTAL_FRAMES):
 
     # Vérifier les collisions
     for circle in circles:
-        circle.check_collision(ball)
+        if circle.check_collision(ball):
+            circles_to_remove.append(circle)
+            circles.remove(circle)
 
     # Gérer les bords de l'écran
     if ball.x - ball.radius < 0 or ball.x + ball.radius > screen.get_width():
         ball.velocity_x = -ball.velocity_x  # Inversion parfaite
         ball.x = max(ball.radius, min(screen.get_width() - ball.radius, ball.x))
-        
+
     if ball.y - ball.radius < 0 or ball.y + ball.radius > screen.get_height():
         ball.velocity_y = -ball.velocity_y  # Inversion parfaite
         ball.y = max(ball.radius, min(screen.get_height() - ball.radius, ball.y))
-
 
     screen.fill((0, 0, 0))
     for circle in circles:

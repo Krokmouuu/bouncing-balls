@@ -1,7 +1,7 @@
 import pygame
 from ball import Ball
 from circle import Circle
-import math
+import random
 
 pygame.init()
 
@@ -13,12 +13,18 @@ running = True
 
 TOTAL_FRAMES = 60 * 61
 
-position_ball_x = 540
-position_ball_y = 200
+position_ball_x = screen.get_width() // 2
+position_ball_y = screen.get_height() // 2
+
+position_circle_x = screen.get_width() // 2
+position_circle_y = screen.get_height() // 2
+start_radius = 200
+
 radius_ball = 20
 color_ball = (0, 0, 255)
 border_color_ball = (255, 255, 255)
 
+number_of_circles = 5
 
 def reset_ball():
     return Ball(
@@ -31,13 +37,35 @@ def reset_ball():
     )
 
 
+def generate_circles(number_of_circles, start_radius, gap):
+    circles = []
+    for i in range(number_of_circles):
+        radius = start_radius + i * gap
+        start_angle = (i * 30) % 360  # Angle de départ unique pour chaque cercle
+        rotation_speed = random.uniform(0.01, 0.05)  # Vitesse de rotation aléatoire
+        circle = Circle(
+            position_circle_x,
+            position_circle_y,
+            radius,
+            (255, 0, 0),  # Couleur des cercles
+            5,  # Épaisseur du contour
+            start_angle,  # Angle de départ
+            gap_angle=0,
+            gap_size=0.5,
+        )
+        circle.rotation_speed = rotation_speed
+        circles.append(circle)
+    return circles
+
+
 ball = reset_ball()
 ball.prev_x = ball.x
 ball.prev_y = ball.y
 ball.x += ball.velocity_x
 ball.y += ball.velocity_y
 
-circle = Circle(900, 500, 500, (255, 0, 0), 5, 100, gap_angle=0, gap_size=0.5)
+gap_between_circles = 20  # Espace entre les cercles
+circles = generate_circles(number_of_circles, start_radius, gap_between_circles)
 
 
 for i in range(TOTAL_FRAMES):
@@ -63,18 +91,22 @@ for i in range(TOTAL_FRAMES):
     ball.y += ball.velocity_y
 
     # Vérifier les collisions
-    circle.check_collision(ball)
+    for circle in circles:
+        circle.check_collision(ball)
 
     # Gérer les bords de l'écran
     if ball.x - ball.radius < 0 or ball.x + ball.radius > screen.get_width():
-        ball.velocity_x *= -0.8
+        ball.velocity_x = -ball.velocity_x  # Inversion parfaite
         ball.x = max(ball.radius, min(screen.get_width() - ball.radius, ball.x))
+        
     if ball.y - ball.radius < 0 or ball.y + ball.radius > screen.get_height():
-        ball.velocity_y *= -0.8
+        ball.velocity_y = -ball.velocity_y  # Inversion parfaite
         ball.y = max(ball.radius, min(screen.get_height() - ball.radius, ball.y))
 
+
     screen.fill((0, 0, 0))
-    circle.draw(screen)
+    for circle in circles:
+        circle.draw(screen)
     ball.draw(screen)
     pygame.display.update()
 

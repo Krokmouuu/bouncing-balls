@@ -10,8 +10,8 @@ class Ball:
         self.color = color
         self.border_color = border_color
         self.border_radius = border_radius
-        self.velocity_x = 0
-        self.velocity_y = 0
+        self.velocity_x = 5
+        self.velocity_y = 5
         self.gravity = 0.5
         self.bounce_factor = 1.0  # Facteur de rebond (1.0 = 100% de l'énergie conservée)
 

@@ -173,6 +173,8 @@ explosion_color = colors.get(
     args.explosion_color, (255, 0, 0)
 )  # Couleur des explosions
 
+start_time = pygame.time.get_ticks()  # Temps de départ en millisecondes
+
 for i in range(TOTAL_FRAMES):
     screen.fill((0, 0, 0))
     clock.tick(60)
@@ -268,21 +270,26 @@ for i in range(TOTAL_FRAMES):
         if len(ball.trail_positions) > ball.max_trail_length:
             ball.trail_positions.pop()
 
-    elapsed_time = (TOTAL_FRAMES - i) // 60
     font = pygame.font.Font(None, 40)
-    minutes = elapsed_time // 60
-    seconds = elapsed_time % 60
+    elapsed_time_ms = pygame.time.get_ticks() - start_time
+    remaining_seconds = max(0, (TOTAL_FRAMES // 60) - (elapsed_time_ms // 1000))
+
+    minutes = remaining_seconds // 60
+    seconds = remaining_seconds % 60
     timer_text = font.render(f"{minutes:02}:{seconds:02}", True, (0, 0, 0))
-    if elapsed_time <= 8:
-        shake_x = random.randint(-5, 5)  # Déplacement horizontal aléatoire
-        shake_y = random.randint(-5, 5)  # Déplacement vertical aléatoire
+
+    # Ajout d'un effet de "shake" si le temps restant est inférieur ou égal à 8 secondes
+    if remaining_seconds <= 8:
+        shake_x = random.randint(-5, 5)
+        shake_y = random.randint(-5, 5)
     else:
         shake_x = 0
         shake_y = 0
 
+    # Position et affichage du timer
     timer_rect = pygame.Rect(
-        screen.get_width() // 2 - 30 + shake_x,  # Ajout du shake horizontal
-        screen.get_height() // 2 + 400 + shake_y,  # Ajout du shake vertical
+        screen.get_width() // 2 - 45 + shake_x,  # Ajustement horizontal
+        screen.get_height() // 2 + 400 + shake_y,  # Ajustement vertical
         90,
         45,
     )

@@ -58,17 +58,6 @@ class Circle:
                 screen, self.color, False, outer_points, self.border_width
             )
 
-        # Dessiner le trou intérieur (complet)
-        inner_points = []
-        for i in range(num_points):
-            angle = self.angle + (2 * math.pi * i / num_points)
-            px = self.x + self.hole_radius * math.cos(angle)
-            py = self.y + self.hole_radius * math.sin(angle)
-            inner_points.append((px, py))
-
-        if len(inner_points) > 2:
-            pygame.draw.lines(screen, (0, 0, 0), True, inner_points, self.border_width)
-
         self.angle += self.rotation_speed
 
     def check_collision(self, ball):

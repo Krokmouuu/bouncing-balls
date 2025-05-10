@@ -51,23 +51,36 @@ color_ball = colors.get(
 )  # Utilise la couleur spécifiée ou noir par défaut
 border_color_ball = (255, 255, 255)
 
+num_balls = int(args.balls)  # Nombre de balles
 
-def reset_ball():
+if num_balls > 5:
+    print("Le nombre de balles doit être inférieur ou égal à 5.")
+    running = False
+
+ball_colors = random.sample(
+    list(colors.values()), num_balls
+)  # Couleurs uniques pour chaque balle
+
+
+def reset_ball(x_offset=0, ball_color=(255, 255, 255)):
+    """Créer une balle avec un décalage horizontal et une couleur spécifique."""
     return Ball(
-        position_ball_x,
+        position_ball_x + x_offset,
         position_ball_y,
         radius_ball,
-        color_ball,
+        ball_color,
         border_color_ball,
         radius_ball + 2,
     )
 
 
-ball = reset_ball()
-ball.prev_x = ball.x
-ball.prev_y = ball.y
-ball.x += ball.velocity_x
-ball.y += ball.velocity_y
+balls = [
+    reset_ball(
+        x_offset=(-100 * (num_balls // 2)) + (i * 100),  # Décalage horizontal
+        ball_color=ball_colors[i],  # Couleur unique pour chaque balle
+    )
+    for i in range(num_balls)
+]
 
 position_circle_x = screen.get_width() // 2
 position_circle_y = screen.get_height() // 2
@@ -122,36 +135,51 @@ for i in range(TOTAL_FRAMES):
         ):
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-            ball = reset_ball()
+            balls = [
+            reset_ball(
+                x_offset=(-100 * (num_balls // 2)) + (i * 100),  # Décalage horizontal
+                ball_color=ball_colors[i],  # Couleur unique pour chaque balle
+            )
+            for i in range(num_balls)
+    ]
 
     if not running:
         break
 
-    # Sauvegarder la position avant mise à jour
-    ball.prev_x = ball.x
-    ball.prev_y = ball.y
+    for ball in balls:
+        # Sauvegarder la position avant mise à jour
+        ball.prev_x = ball.x
+        ball.prev_y = ball.y
 
-    # Mettre à jour la position
-    ball.velocity_y += ball.gravity
-    ball.x += ball.velocity_x
-    ball.y += ball.velocity_y
+        # Mettre à jour la position
+        ball.velocity_y += ball.gravity
+        ball.x += ball.velocity_x
+        ball.y += ball.velocity_y
 
-    # Vérifier les collisions
-    for circle in circles[:]:
-        if circle.check_collision(ball):
-            # Ajoute une explosion avant de supprimer le cercle
-            explosions.append(
-                Explosion(
-                    circle.x,
-                    circle.y,
-                    circle.radius,
-                    explosion_color,  # Bleu plus clair et visible
+        # Gérer les bords de l'écran
+        if ball.x - ball.radius < 0 or ball.x + ball.radius > screen.get_width():
+            ball.velocity_x = -ball.velocity_x
+            ball.x = max(ball.radius, min(screen.get_width() - ball.radius, ball.x))
+
+        if ball.y - ball.radius < 0 or ball.y + ball.radius > screen.get_height():
+            ball.velocity_y = -ball.velocity_y
+            ball.y = max(ball.radius, min(screen.get_height() - ball.radius, ball.y))
+
+        # Vérifier les collisions avec les cercles
+        for circle in circles[:]:
+            if circle.check_collision(ball):
+                explosions.append(
+                    Explosion(
+                        circle.x,
+                        circle.y,
+                        circle.radius,
+                        explosion_color,
+                    )
                 )
-            )
-            circles.remove(circle)
-            if next_circle_index < len(all_circles):
-                circles.append(all_circles[next_circle_index])
-                next_circle_index += 1
+                circles.remove(circle)
+                if next_circle_index < len(all_circles):
+                    circles.append(all_circles[next_circle_index])
+                    next_circle_index += 1
 
     # Mettez à jour et dessinez les explosions
     for explosion in explosions[:]:
@@ -181,10 +209,12 @@ for i in range(TOTAL_FRAMES):
 
     for circle in circles:
         circle.draw(screen)
-    ball.draw(screen)
-    ball.trail_positions.insert(0, (ball.x, ball.y))
-    if len(ball.trail_positions) > ball.max_trail_length:
-        ball.trail_positions.pop()
+
+    for ball in balls:
+        ball.draw(screen)
+        ball.trail_positions.insert(0, (ball.x, ball.y))
+        if len(ball.trail_positions) > ball.max_trail_length:
+            ball.trail_positions.pop()
 
     elapsed_time = (TOTAL_FRAMES - i) // 60
     font = pygame.font.Font(None, 40)

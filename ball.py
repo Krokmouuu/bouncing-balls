@@ -49,7 +49,7 @@ class Ball:
         for i, (pos_x, pos_y) in enumerate(self.trail_positions):
             # Calculer l'alpha (transparence) en fonction de l'âge de la position
             alpha = int(255 * (i / len(self.trail_positions)))
-            trail_color = (0,0,255, alpha)  # Couleur de la traînée avec transparence
+            trail_color = (self.color)  # Couleur de la traînée avec transparence
             
             # Dessiner chaque point de la traînée
             trail_radius = max(1, int(self.radius * (i / len(self.trail_positions))))

@@ -49,7 +49,7 @@ def generate_circles(number_of_circles, start_radius, gap):
     for i in range(number_of_circles):
         radius = start_radius + i * gap
         start_angle = (i * 30) % 360  # Angle de départ unique pour chaque cercle
-        rotation_speed = random.uniform(0.01, 0.03)  # Vitesse de rotation aléatoire
+        rotation_speed = random.uniform(0.02, 0.03)  # Vitesse de rotation aléatoire
         circle = Circle(
             position_circle_x,
             position_circle_y,
@@ -68,6 +68,10 @@ def generate_circles(number_of_circles, start_radius, gap):
 gap_between_circles = 30  # Espace entre les cercles
 circles = generate_circles(number_of_circles, start_radius, gap_between_circles)
 circles_to_remove = []
+
+base_circle = circles[0]
+base_circle.min_radius = 100
+base_circle.shrink_rate = 0.1
 
 for i in range(TOTAL_FRAMES):
     clock.tick(60)
@@ -105,6 +109,16 @@ for i in range(TOTAL_FRAMES):
     if ball.y - ball.radius < 0 or ball.y + ball.radius > screen.get_height():
         ball.velocity_y = -ball.velocity_y  # Inversion parfaite
         ball.y = max(ball.radius, min(screen.get_height() - ball.radius, ball.y))
+
+    if circles:
+        base_circle = circles[0]
+        if base_circle.radius > base_circle.min_radius:
+            base_circle.radius -= base_circle.shrink_rate
+            base_circle.radius = max(base_circle.radius, base_circle.min_radius)
+
+        # Mise à jour des rayons des autres cercles
+        for idx, circle in enumerate(circles):
+            circle.radius = base_circle.radius + idx * gap_between_circles
 
     screen.fill((0, 0, 0))
     for circle in circles:

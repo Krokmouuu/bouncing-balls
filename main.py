@@ -41,7 +41,7 @@ position_circle_x = screen.get_width() // 2
 position_circle_y = screen.get_height() // 2
 thickness = 5
 start_radius = 200
-number_of_circles = 10
+number_of_circles = 20
 
 
 def generate_circles(number_of_circles, start_radius, gap):
@@ -49,7 +49,7 @@ def generate_circles(number_of_circles, start_radius, gap):
     for i in range(number_of_circles):
         radius = start_radius + i * gap
         start_angle = (i * 30) % 360  # Angle de départ unique pour chaque cercle
-        rotation_speed = random.uniform(0.01, 0.05)  # Vitesse de rotation aléatoire
+        rotation_speed = random.uniform(0.01, 0.03)  # Vitesse de rotation aléatoire
         circle = Circle(
             position_circle_x,
             position_circle_y,

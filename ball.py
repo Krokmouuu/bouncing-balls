@@ -4,6 +4,8 @@ class Ball:
     def __init__(self, x, y, radius, color, border_color=None, border_radius=None):
         self.x = x
         self.y = y
+        self.prev_x = x
+        self.prev_y = y
         self.radius = radius
         self.color = color
         self.border_color = border_color

@@ -1,4 +1,6 @@
 import pygame
+
+
 class Ball:
     def __init__(self, x, y, radius, color, border_color=None, border_radius=None):
         self.x = x
@@ -12,12 +14,12 @@ class Ball:
         self.velocity_x = 5
         self.velocity_y = 5
         self.gravity = 0.5
-        self.bounce_factor = 1.01
+        self.bounce_factor = 1
 
     def update(self, screen_width, screen_height):
         # Appliquer la gravité
         self.velocity_y += self.gravity
-        
+
         # Mettre à jour la position
         self.x += self.velocity_x
         self.y += self.velocity_y
@@ -41,5 +43,10 @@ class Ball:
 
     def draw(self, screen):
         if self.border_color and self.border_radius:
-            pygame.draw.circle(screen, self.border_color, [int(self.x), int(self.y)], self.border_radius)
-        pygame.draw.circle(screen, self.color, [int(self.x), int(self.y)], self.radius) 
+            pygame.draw.circle(
+                screen,
+                self.border_color,
+                [int(self.x), int(self.y)],
+                self.border_radius,
+            )
+        pygame.draw.circle(screen, self.color, [int(self.x), int(self.y)], self.radius)

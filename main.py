@@ -148,6 +148,9 @@ for i in range(TOTAL_FRAMES):
     for circle in circles:
         circle.draw(screen)
     ball.draw(screen)
+    ball.trail_positions.insert(0, (ball.x, ball.y))  
+    if len(ball.trail_positions) > ball.max_trail_length:
+        ball.trail_positions.pop()  
     pygame.display.update()
 
 pygame.quit()

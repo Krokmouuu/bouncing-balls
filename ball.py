@@ -14,8 +14,10 @@ class Ball:
         self.velocity_x = 5
         self.velocity_y = 5
         self.gravity = 0.5
-        self.bounce_factor = 1.01
+        self.bounce_factor = 1.27
         self.max_speed = 15
+        self.trail_positions = []
+        self.max_trail_length = 15
 
     def update(self, screen_width, screen_height):
         # Appliquer la gravité
@@ -43,6 +45,17 @@ class Ball:
             self.velocity_y = -self.velocity_y * self.bounce_factor
 
     def draw(self, screen):
+        # Dessiner la traînée
+        for i, (pos_x, pos_y) in enumerate(self.trail_positions):
+            # Calculer l'alpha (transparence) en fonction de l'âge de la position
+            alpha = int(255 * (i / len(self.trail_positions)))
+            trail_color = (0,0,255, alpha)  # Couleur de la traînée avec transparence
+            
+            # Dessiner chaque point de la traînée
+            trail_radius = max(1, int(self.radius * (i / len(self.trail_positions))))
+            pygame.draw.circle(screen, trail_color, [int(pos_x), int(pos_y)], trail_radius)
+
+        # Dessiner la boule principale
         if self.border_color and self.border_radius:
             pygame.draw.circle(
                 screen,

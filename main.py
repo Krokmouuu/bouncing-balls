@@ -69,6 +69,8 @@ def reset_ball(x_offset=0, ball_color=(255, 255, 255)):
         position_ball_y,
         radius_ball,
         ball_color,
+        random.uniform(-5, 5),  # Vitesse horizontale aléatoire
+        random.uniform(-5, 5),  # Vitesse verticale aléatoire
         border_color_ball,
         radius_ball + 2,
     )

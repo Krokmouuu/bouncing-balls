@@ -2,7 +2,7 @@ import pygame
 
 
 class Ball:
-    def __init__(self, x, y, radius, color, border_color=None, border_radius=None):
+    def __init__(self, x, y, radius, color, velocity_x, velocity_y, border_color=None, border_radius=None):
         self.x = x
         self.y = y
         self.prev_x = x
@@ -11,8 +11,8 @@ class Ball:
         self.color = color
         self.border_color = border_color
         self.border_radius = border_radius
-        self.velocity_x = 5
-        self.velocity_y = 5
+        self.velocity_x = velocity_x
+        self.velocity_y = velocity_y
         self.gravity = 0.5
         self.bounce_factor = 1.27
         self.max_speed = 13

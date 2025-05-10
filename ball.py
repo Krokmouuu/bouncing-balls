@@ -14,7 +14,8 @@ class Ball:
         self.velocity_x = 5
         self.velocity_y = 5
         self.gravity = 0.5
-        self.bounce_factor = 1
+        self.bounce_factor = 1.01
+        self.max_speed = 15
 
     def update(self, screen_width, screen_height):
         # Appliquer la gravité

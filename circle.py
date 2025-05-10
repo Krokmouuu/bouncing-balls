@@ -132,11 +132,11 @@ class Circle:
 
             # Repositionnement précis avec marge de sécurité
             if distance < self.radius:
-                ball.x = self.x + nx * (self.radius - ball.radius * 0.9)
-                ball.y = self.y + ny * (self.radius - ball.radius * 0.9)
+                ball.x = self.x + nx * (self.radius - ball.radius * 0.95)
+                ball.y = self.y + ny * (self.radius - ball.radius * 0.95)
             else:
-                ball.x = self.x + nx * (self.radius + ball.radius * 0.9)
-                ball.y = self.y + ny * (self.radius + ball.radius * 0.9)
+                ball.x = self.x + nx * (self.radius + ball.radius * 0.95)
+                ball.y = self.y + ny * (self.radius + ball.radius * 0.95)
 
             # Calcul du rebond
             dot_product = ball.velocity_x * nx + ball.velocity_y * ny
@@ -151,4 +151,8 @@ class Circle:
         ball.prev_x = ball.x
         ball.prev_y = ball.y
 
+        speed = math.sqrt(ball.velocity_x**2 + ball.velocity_y**2)
+        if speed > ball.max_speed:
+            ball.velocity_x = ball.velocity_x / speed * ball.max_speed
+            ball.velocity_y = ball.velocity_y / speed * ball.max_speed
         return False

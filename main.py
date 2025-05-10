@@ -1,6 +1,7 @@
 import pygame
 from ball import Ball
 from circle import Circle
+from explosion import Explosion
 import random
 
 pygame.init()
@@ -16,7 +17,7 @@ TOTAL_FRAMES = 60 * 61
 position_ball_x = screen.get_width() // 2
 position_ball_y = screen.get_height() // 2
 radius_ball = 20
-color_ball = (0, 0, 255)
+color_ball = (0, 0, 0)
 border_color_ball = (255, 255, 255)
 
 
@@ -75,7 +76,10 @@ base_circle = circles[0]
 base_circle.min_radius = 100
 base_circle.shrink_rate = 0.1
 
+explosions = []
+
 for i in range(TOTAL_FRAMES):
+    screen.fill((0, 0, 0))
     clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (
@@ -98,12 +102,29 @@ for i in range(TOTAL_FRAMES):
     ball.y += ball.velocity_y
 
     # Vérifier les collisions
-    for circle in circles[:]:  # Copie pour éviter modification pendant l'itération
+    for circle in circles[:]:
         if circle.check_collision(ball):
+            # Ajoute une explosion avant de supprimer le cercle
+            # Lorsque vous créez l'explosion, utilisez une couleur plus vive :
+            explosions.append(
+                Explosion(
+                    circle.x,
+                    circle.y,
+                    circle.radius,
+                    (255, 000, 000),  # Bleu plus clair et visible
+                )
+            )
             circles.remove(circle)
             if next_circle_index < len(all_circles):
                 circles.append(all_circles[next_circle_index])
                 next_circle_index += 1
+
+    # Mettez à jour et dessinez les explosions
+    for explosion in explosions[:]:
+        explosion.update()
+        explosion.draw(screen)
+        if explosion.is_done():
+            explosions.remove(explosion)
 
     # Gérer les bords de l'écran
     if ball.x - ball.radius < 0 or ball.x + ball.radius > screen.get_width():
@@ -124,7 +145,6 @@ for i in range(TOTAL_FRAMES):
         for idx, circle in enumerate(circles):
             circle.radius = base_circle.radius + idx * gap_between_circles
 
-    screen.fill((0, 0, 0))
     for circle in circles:
         circle.draw(screen)
     ball.draw(screen)

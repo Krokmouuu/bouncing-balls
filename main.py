@@ -5,6 +5,7 @@ from explosion import Explosion
 import random
 from colors import colors
 import argparse
+import math
 
 parser = argparse.ArgumentParser(description="Bouncing Ball Game")
 parser.add_argument(
@@ -60,6 +61,50 @@ if num_balls > 5:
 ball_colors = random.sample(
     list(colors.values()), num_balls
 )  # Couleurs uniques pour chaque balle
+
+
+def check_ball_collision(ball1, ball2):
+    """Vérifie si deux balles se heurtent."""
+    dx = ball1.x - ball2.x
+    dy = ball1.y - ball2.y
+    distance = math.sqrt(dx**2 + dy**2)
+    return distance < (ball1.radius + ball2.radius)
+
+
+def resolve_ball_collision(ball1, ball2):
+    """Résout la collision entre deux balles."""
+    dx = ball1.x - ball2.x
+    dy = ball1.y - ball2.y
+    distance = math.sqrt(dx**2 + dy**2)
+
+    if distance == 0:  # Évite la division par zéro
+        return
+
+    # Calculer les vecteurs de collision
+    overlap = 0.5 * (distance - ball1.radius - ball2.radius)
+    ball1.x -= overlap * (dx / distance)
+    ball1.y -= overlap * (dy / distance)
+    ball2.x += overlap * (dx / distance)
+    ball2.y += overlap * (dy / distance)
+
+    # Calculer les nouvelles vitesses après collision
+    nx = dx / distance
+    ny = dy / distance
+    p = (
+        2
+        * (
+            ball1.velocity_x * nx
+            + ball1.velocity_y * ny
+            - ball2.velocity_x * nx
+            - ball2.velocity_y * ny
+        )
+        / (ball1.radius + ball2.radius)
+    )
+
+    ball1.velocity_x -= p * ball2.radius * nx
+    ball1.velocity_y -= p * ball2.radius * ny
+    ball2.velocity_x += p * ball1.radius * nx
+    ball2.velocity_y += p * ball1.radius * ny
 
 
 def reset_ball(x_offset=0, ball_color=(255, 255, 255)):
@@ -138,12 +183,13 @@ for i in range(TOTAL_FRAMES):
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
             balls = [
-            reset_ball(
-                x_offset=(-100 * (num_balls // 2)) + (i * 100),  # Décalage horizontal
-                ball_color=ball_colors[i],  # Couleur unique pour chaque balle
-            )
-            for i in range(num_balls)
-    ]
+                reset_ball(
+                    x_offset=(-100 * (num_balls // 2))
+                    + (i * 100),  # Décalage horizontal
+                    ball_color=ball_colors[i],  # Couleur unique pour chaque balle
+                )
+                for i in range(num_balls)
+            ]
 
     if not running:
         break
@@ -212,6 +258,10 @@ for i in range(TOTAL_FRAMES):
     for circle in circles:
         circle.draw(screen)
 
+    for i in range(len(balls)):
+        for j in range(i + 1, len(balls)):
+            if check_ball_collision(balls[i], balls[j]):
+                resolve_ball_collision(balls[i], balls[j])
     for ball in balls:
         ball.draw(screen)
         ball.trail_positions.insert(0, (ball.x, ball.y))

@@ -14,7 +14,6 @@ class Vaporization:
         self.create_particles()
 
     def create_particles(self):
-        pygame.mixer.Sound.play(destroy)
         for _ in range(250):  # Augmenter le nombre de particules pour un effet dense
             angle = random.uniform(0, 2 * math.pi)  # Angle autour du cercle
             distance = random.uniform(

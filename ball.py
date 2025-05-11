@@ -13,6 +13,7 @@ class Ball:
         border_color=None,
         border_radius=None,
         text="",
+        image_path=None,  # Ajoutez un chemin d'image
     ):
         self.x = x
         self.y = y
@@ -32,7 +33,13 @@ class Ball:
         self.text = text
         self.circles_destroyed = 0
         self.shake_frames = 0
+        self.image = None
 
+        if image_path:
+            self.image = pygame.image.load(image_path)
+            self.image = pygame.transform.scale(
+                self.image, (self.radius * 2, self.radius * 2)
+            )
 
     def update(self, screen_width, screen_height):
         # Appliquer la gravité
@@ -87,15 +94,43 @@ class Ball:
                 trail_surface, (int(pos_x - trail_radius), int(pos_y - trail_radius))
             )
 
-        # Dessiner la boule principale
-        if self.border_color and self.border_radius:
+        # Dessiner l'image si elle existe
+        if self.image:
+                # Créer une surface circulaire pour masquer l'image
+                mask_surface = pygame.Surface(
+                    (self.radius * 2, self.radius * 2), pygame.SRCALPHA
+                )
+                pygame.draw.circle(
+                    mask_surface,
+                    (255, 255, 255, 255),  # Couleur blanche opaque pour le masque
+                    (self.radius, self.radius),
+                    self.radius,
+                )
+
+                # Appliquer le masque à l'image
+                image_surface = pygame.Surface(
+                    (self.radius * 2, self.radius * 2), pygame.SRCALPHA
+                )
+                image_surface.blit(self.image, (0, 0))
+                image_surface.blit(mask_surface, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
+
+                # Dessiner l'image masquée sur l'écran
+                screen.blit(
+                    image_surface,
+                    (int(self.x - self.radius), int(self.y - self.radius)),
+                )
+        else:
+            # Dessiner la boule principale si aucune image n'est fournie
+            if self.border_color and self.border_radius:
+                pygame.draw.circle(
+                    screen,
+                    self.border_color,
+                    [int(self.x), int(self.y)],
+                    self.border_radius,
+                )
             pygame.draw.circle(
-                screen,
-                self.border_color,
-                [int(self.x), int(self.y)],
-                self.border_radius,
+                screen, self.color, [int(self.x), int(self.y)], self.radius
             )
-        pygame.draw.circle(screen, self.color, [int(self.x), int(self.y)], self.radius)
 
         if self.text:
             font = pygame.font.Font(None, 24)  # Taille de la police

@@ -8,13 +8,8 @@ import argparse
 import math
 import mixer
 
+
 parser = argparse.ArgumentParser(description="Bouncing Ball Game")
-parser.add_argument(
-    "--ball_color",
-    type=str,
-    default="black",
-    help="Couleur de la balle (nom de couleur)",
-)
 parser.add_argument(
     "--circle_color",
     type=str,
@@ -65,11 +60,11 @@ parser.add_argument(
         help="Titre",
     ),
 )
+pygame.init()
 args = parser.parse_args()
 pygame.mixer.init()
 bounce = pygame.mixer.Sound("sounds/water.wav")
 destroy = pygame.mixer.Sound("sounds/nice.wav")
-pygame.init()
 
 screen = pygame.display.set_mode((1920, 1080))
 pygame.display.set_caption("Bouncing Ball")
@@ -81,7 +76,7 @@ TOTAL_FRAMES = 60 * 61
 
 position_ball_x = screen.get_width() // 2
 position_ball_y = screen.get_height() // 2
-radius_ball = 20
+radius_ball = 30
 border_color_ball = (255, 255, 255)
 
 num_balls = int(args.balls)  # Nombre de balles
@@ -139,7 +134,7 @@ def resolve_ball_collision(ball1, ball2):
     ball2.velocity_y += p * ball1.radius * ny
 
 
-def reset_ball(x_offset=0, ball_color=(255, 255, 255), text=""):
+def reset_ball(x_offset=0, ball_color=(255, 255, 255), text="", image_path=None):
     """Créer une balle avec un décalage horizontal et une couleur spécifique."""
     return Ball(
         position_ball_x + x_offset,
@@ -151,6 +146,7 @@ def reset_ball(x_offset=0, ball_color=(255, 255, 255), text=""):
         border_color_ball,
         radius_ball + 2,
         text=text,
+        image_path=image_path,  # Chemin de l'image
     )
 
 
@@ -162,11 +158,14 @@ ball_texts = [
     args.text5,
 ]  # Textes des balles
 
+ball_images = ["images/gorilla.jpg", "images/human.jpeg"]  # Chemins des images
+
 balls = [
     reset_ball(
         x_offset=(-100 * (num_balls // 2)) + (i * 100),  # Décalage horizontal
         ball_color=ball_colors[i],  # Couleur unique pour chaque balle
         text=ball_texts[i] if i < len(ball_texts) else "",  # Texte pour chaque balle
+        image_path=ball_images[i] if i < len(ball_images) else None,  # Ajoutez l'image
     )
     for i in range(num_balls)
 ]
@@ -182,8 +181,9 @@ elif num_balls == 1:
 else:
     start_radius = 200
     number_of_circles = 55
-circle_color = colors.get(args.circle_color, (0, 0, 0))  # Couleur des cercles
+circle_color = colors.get(args.circle_color, (255, 255, 255))  # Couleur des cercles
 
+bounce.set_volume(0.3)
 
 def generate_circles(number_of_circles, start_radius, gap):
     circles = []
@@ -217,8 +217,8 @@ base_circle.min_radius = 100
 base_circle.shrink_rate = 0.1
 
 explosions = []
-
-start_time = pygame.time.get_ticks()  # Temps de départ en millisecondes
+last_bounce_time = 0
+start_time = pygame.time.get_ticks()
 for i in range(TOTAL_FRAMES):
     screen.fill((0, 0, 0))
     clock.tick(60)
@@ -233,6 +233,9 @@ for i in range(TOTAL_FRAMES):
                     x_offset=(-100 * (num_balls // 2))
                     + (i * 100),  # Décalage horizontal
                     ball_color=ball_colors[i],  # Couleur unique pour chaque balle
+                    text=ball_texts[i]
+                    if i < len(ball_texts)
+                    else "",  # Texte pour chaque balle
                 )
                 for i in range(num_balls)
             ]
@@ -280,8 +283,10 @@ for i in range(TOTAL_FRAMES):
                     circles.append(all_circles[next_circle_index])
                     next_circle_index += 1
             elif has_collided:
-                pygame.mixer.Sound.play(bounce)
-
+                current_time = pygame.time.get_ticks()  # Temps actuel en millisecondes
+                if current_time - last_bounce_time > 100:  # Délai minimum de 100 ms entre les sons
+                    pygame.mixer.Sound.play(bounce)  # Jouer le son "bounce"
+                    last_bounce_time = current_time # Mettre à jour le temps du dernier rebond
 
     # Mettez à jour et dessinez les explosions
     for explosion in explosions[:]:
@@ -431,7 +436,35 @@ for i in range(TOTAL_FRAMES):
                 screen.blit(text, text_rect)
                 screen.blit(colon_text, colon_rect)
                 screen.blit(counter_text, counter_rect)
+    if len(circles) == 0:
+        break
 
     pygame.display.update()
+
+
+max_destroyed = max(balls, key=lambda ball: ball.circles_destroyed)
+winner_text = f"Winner: {max_destroyed.text} ({max_destroyed.circles_destroyed})"
+winner_color_text = f"Couleur: {max_destroyed.color}"  # Ajouter la couleur du gagnant
+# Afficher le message au milieu de l'écran
+font = pygame.font.Font(None, 80)  # Taille de la police
+text_surface = font.render(
+    winner_text, True, max_destroyed.color
+)  # Texte avec la couleur du gagnant
+color_surface = font.render(
+    winner_color_text, True, max_destroyed.color
+)  # Texte pour la couleur
+# Positionner les texte
+text_rect = text_surface.get_rect(
+    center=(screen.get_width() // 2, screen.get_height() // 2 - 50)
+)
+color_rect = color_surface.get_rect(
+    center=(screen.get_width() // 2, screen.get_height() // 2 + 50)
+)
+
+screen.fill((0, 0, 0))  # Effacer l'écran
+screen.blit(text_surface, text_rect)  # Dessiner le texte principal
+pygame.display.update()
+# Attendre quelques secondes avant de quitter
+pygame.time.wait(2000)
 
 pygame.quit()

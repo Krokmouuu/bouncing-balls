@@ -6,6 +6,7 @@ import random
 from colors import colors
 import argparse
 import math
+import mixer
 
 parser = argparse.ArgumentParser(description="Bouncing Ball Game")
 parser.add_argument(
@@ -65,7 +66,9 @@ parser.add_argument(
     ),
 )
 args = parser.parse_args()
-
+pygame.mixer.init()
+bounce = pygame.mixer.Sound("sounds/water.wav")
+destroy = pygame.mixer.Sound("sounds/nice.wav")
 pygame.init()
 
 screen = pygame.display.set_mode((1920, 1080))
@@ -258,17 +261,9 @@ for i in range(TOTAL_FRAMES):
 
         # Vérifier les collisions avec les cercles
         for circle in circles[:]:
-            if circle.check_collision(ball):
-                # Ajouter une explosion
-                explosions.append(
-                    Explosion(
-                        circle.x,
-                        circle.y,
-                        circle.radius,
-                        ball.color,
-                    )
-                )
-                # Ajouter une vaporisation
+            should_destroy, has_collided = circle.check_collision(ball)
+            if should_destroy:
+                pygame.mixer.Sound.play(destroy)
                 explosions.append(
                     Vaporization(
                         circle.x,
@@ -279,10 +274,14 @@ for i in range(TOTAL_FRAMES):
                 )
                 circles.remove(circle)
                 ball.circles_destroyed += 1
-                ball.shake_frames = 2  # Activez l'effet de "shake" pour 2 frames
+                ball.shake_frames = 4
+
                 if next_circle_index < len(all_circles):
                     circles.append(all_circles[next_circle_index])
                     next_circle_index += 1
+            elif has_collided:
+                pygame.mixer.Sound.play(bounce)
+
 
     # Mettez à jour et dessinez les explosions
     for explosion in explosions[:]:
@@ -402,7 +401,10 @@ for i in range(TOTAL_FRAMES):
                 # Rendre le texte de la balle
                 text = font.render(ball.text, True, ball_colors[i])
                 text_rect = text.get_rect(
-                    center=(rect_x + rect_width // 2 - 20 + shake_x, rect_y + rect_height // 2 + shake_y)
+                    center=(
+                        rect_x + rect_width // 2 - 20 + shake_x,
+                        rect_y + rect_height // 2 + shake_y,
+                    )
                 )
 
                 # Rendre le ":" entre le texte et le compteur
@@ -419,7 +421,10 @@ for i in range(TOTAL_FRAMES):
                     str(ball.circles_destroyed), True, ball_colors[i]
                 )
                 counter_rect = counter_text.get_rect(
-                    center=(rect_x + rect_width // 2 + 40 + shake_x, rect_y + rect_height // 2 + shake_y)
+                    center=(
+                        rect_x + rect_width // 2 + 40 + shake_x,
+                        rect_y + rect_height // 2 + shake_y,
+                    )
                 )
 
                 # Afficher le texte, le ":" et le score dans le rectangle

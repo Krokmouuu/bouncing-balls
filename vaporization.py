@@ -2,7 +2,8 @@ import pygame
 import random
 import math
 
-
+pygame.mixer.init()
+destroy= pygame.mixer.Sound("sounds/nice.wav")
 class Vaporization:
     def __init__(self, x, y, radius, color):
         self.x = x
@@ -13,7 +14,8 @@ class Vaporization:
         self.create_particles()
 
     def create_particles(self):
-        for _ in range(150):  # Augmenter le nombre de particules pour un effet dense
+        pygame.mixer.Sound.play(destroy)
+        for _ in range(250):  # Augmenter le nombre de particules pour un effet dense
             angle = random.uniform(0, 2 * math.pi)  # Angle autour du cercle
             distance = random.uniform(
                 self.radius * 0.9, self.radius * 1.1

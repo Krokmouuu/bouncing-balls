@@ -279,7 +279,7 @@ for i in range(TOTAL_FRAMES):
                 )
                 circles.remove(circle)
                 ball.circles_destroyed += 1
-                ball.shake_frames = 4
+                ball.shake_frames = 2  # Activez l'effet de "shake" pour 2 frames
                 if next_circle_index < len(all_circles):
                     circles.append(all_circles[next_circle_index])
                     next_circle_index += 1

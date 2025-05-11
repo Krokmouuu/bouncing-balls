@@ -1,7 +1,7 @@
 import pygame
 import random
 import math
-from vaporization import Vaporization
+from vaporization import Vaporization  # noqa: F401
 
 
 class Explosion:

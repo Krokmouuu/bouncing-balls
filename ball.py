@@ -19,6 +19,7 @@ class Ball:
         self.trail_positions = []
         self.max_trail_length = 15
         self.text = text
+        self.circles_destroyed = 0
 
     def update(self, screen_width, screen_height):
         # Appliquer la gravité
@@ -71,3 +72,7 @@ class Ball:
             text_surface = font.render(self.text, True, (0, 0, 0))  # Texte en blanc
             text_rect = text_surface.get_rect(center=(int(self.x), int(self.y)))
             screen.blit(text_surface, text_rect)
+
+        # font = pygame.font.Font(None, 20)
+        # counter_text = font.render(f"{self.circles_destroyed}", True, (255, 255, 255))
+        # screen.blit(counter_text, (int(self.x) - 10, int(self.y) - self.radius - 20))

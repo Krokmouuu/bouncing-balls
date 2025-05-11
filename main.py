@@ -50,6 +50,12 @@ parser.add_argument(
     default="",
     help="Texte à afficher sur la boule 3",
 )
+parser.add_argument(
+    "--title",
+    type=str,
+    default="",
+    help="Titre",
+),
 args = parser.parse_args()
 
 pygame.init()
@@ -195,7 +201,6 @@ explosion_color = colors.get(
 )  # Couleur des explosions
 
 start_time = pygame.time.get_ticks()  # Temps de départ en millisecondes
-
 for i in range(TOTAL_FRAMES):
     screen.fill((0, 0, 0))
     clock.tick(60)
@@ -244,10 +249,11 @@ for i in range(TOTAL_FRAMES):
                         circle.x,
                         circle.y,
                         circle.radius,
-                        explosion_color,
+                        ball.color,
                     )
                 )
                 circles.remove(circle)
+                ball.circles_destroyed += 1
                 if next_circle_index < len(all_circles):
                     circles.append(all_circles[next_circle_index])
                     next_circle_index += 1
@@ -316,6 +322,19 @@ for i in range(TOTAL_FRAMES):
     )
     pygame.draw.rect(screen, (255, 255, 255), timer_rect)
     screen.blit(timer_text, (timer_rect.x + 10, timer_rect.y + 10))
+
+    # Affichage du titre
+    if args.title != "":
+        text = font.render(args.title, True, (0, 0, 0))  # Texte en noir
+        rect_x = screen.get_width() // 2 - 150 # Position horizontale
+        rect_y = 100  # Position verticale
+        rect_width = 300 # Largeur
+        rect_height = 80  # Hauteur
+        pygame.draw.rect(screen, (255, 255, 255), (rect_x, rect_y, rect_width, rect_height))
+
+        font = pygame.font.Font(None, 40)  # Taille de la police
+        text_rect = text.get_rect(center=(rect_x + rect_width // 2, rect_y + rect_height // 2))
+        screen.blit(text, text_rect)
 
     pygame.display.update()
 

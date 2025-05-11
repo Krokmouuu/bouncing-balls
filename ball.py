@@ -2,7 +2,7 @@ import pygame
 
 
 class Ball:
-    def __init__(self, x, y, radius, color, velocity_x, velocity_y, border_color=None, border_radius=None):
+    def __init__(self, x, y, radius, color, velocity_x, velocity_y, border_color=None, border_radius=None, text=""):
         self.x = x
         self.y = y
         self.prev_x = x
@@ -18,6 +18,7 @@ class Ball:
         self.max_speed = 13
         self.trail_positions = []
         self.max_trail_length = 15
+        self.text = text
 
     def update(self, screen_width, screen_height):
         # Appliquer la gravité
@@ -64,3 +65,9 @@ class Ball:
                 self.border_radius,
             )
         pygame.draw.circle(screen, self.color, [int(self.x), int(self.y)], self.radius)
+
+        if self.text:
+            font = pygame.font.Font(None, 24)  # Taille de la police
+            text_surface = font.render(self.text, True, (0, 0, 0))  # Texte en blanc
+            text_rect = text_surface.get_rect(center=(int(self.x), int(self.y)))
+            screen.blit(text_surface, text_rect)

@@ -32,6 +32,24 @@ parser.add_argument(
     default="1",
     help="Nombre de balle",
 )
+parser.add_argument(
+    "--text1",
+    type=str,
+    default="",
+    help="Texte à afficher sur la boule 1",
+)
+parser.add_argument(
+    "--text2",
+    type=str,
+    default="",
+    help="Texte à afficher sur la boule 2",
+)
+parser.add_argument(
+    "--text3",
+    type=str,
+    default="",
+    help="Texte à afficher sur la boule 3",
+)
 args = parser.parse_args()
 
 pygame.init()
@@ -106,8 +124,7 @@ def resolve_ball_collision(ball1, ball2):
     ball2.velocity_x += p * ball1.radius * nx
     ball2.velocity_y += p * ball1.radius * ny
 
-
-def reset_ball(x_offset=0, ball_color=(255, 255, 255)):
+def reset_ball(x_offset=0, ball_color=(255, 255, 255), text=""):
     """Créer une balle avec un décalage horizontal et une couleur spécifique."""
     return Ball(
         position_ball_x + x_offset,
@@ -118,13 +135,17 @@ def reset_ball(x_offset=0, ball_color=(255, 255, 255)):
         random.uniform(-5, 5),  # Vitesse verticale aléatoire
         border_color_ball,
         radius_ball + 2,
+        text=text,
     )
 
+
+ball_texts = [args.text1, args.text2, args.text3]  # Textes des balles
 
 balls = [
     reset_ball(
         x_offset=(-100 * (num_balls // 2)) + (i * 100),  # Décalage horizontal
         ball_color=ball_colors[i],  # Couleur unique pour chaque balle
+        text=ball_texts[i] if i < len(ball_texts) else "",  # Texte pour chaque balle
     )
     for i in range(num_balls)
 ]

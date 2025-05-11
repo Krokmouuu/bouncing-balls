@@ -11,12 +11,6 @@ import mixer
 
 parser = argparse.ArgumentParser(description="Bouncing Ball Game")
 parser.add_argument(
-    "--circle_color",
-    type=str,
-    default="white",
-    help="Couleur des cercles (nom de couleur)",
-)
-parser.add_argument(
     "--balls",
     type=str,
     default="1",
@@ -177,13 +171,14 @@ if num_balls >= 4:
     start_radius = 250
     number_of_circles = 70
 elif num_balls == 1:
+    start_radius = 200
     number_of_circles = 40
 else:
     start_radius = 200
-    number_of_circles = 55
-circle_color = colors.get(args.circle_color, (255, 255, 255))  # Couleur des cercles
+    number_of_circles = 60
 
 bounce.set_volume(0.3)
+
 
 def generate_circles(number_of_circles, start_radius, gap):
     circles = []
@@ -191,6 +186,7 @@ def generate_circles(number_of_circles, start_radius, gap):
         radius = start_radius + i * gap
         start_angle = (i * 30) % 360  # Angle de départ unique pour chaque cercle
         rotation_speed = random.uniform(0.02, 0.03)  # Vitesse de rotation aléatoire
+        circle_color = random.choice(list(colors.values()))  # Couleur aléatoire
         circle = Circle(
             position_circle_x,
             position_circle_y,
@@ -284,9 +280,13 @@ for i in range(TOTAL_FRAMES):
                     next_circle_index += 1
             elif has_collided:
                 current_time = pygame.time.get_ticks()  # Temps actuel en millisecondes
-                if current_time - last_bounce_time > 100:  # Délai minimum de 100 ms entre les sons
+                if (
+                    current_time - last_bounce_time > 100
+                ):  # Délai minimum de 100 ms entre les sons
                     pygame.mixer.Sound.play(bounce)  # Jouer le son "bounce"
-                    last_bounce_time = current_time # Mettre à jour le temps du dernier rebond
+                    last_bounce_time = (
+                        current_time  # Mettre à jour le temps du dernier rebond
+                    )
 
     # Mettez à jour et dessinez les explosions
     for explosion in explosions[:]:
@@ -412,29 +412,19 @@ for i in range(TOTAL_FRAMES):
                     )
                 )
 
-                # Rendre le ":" entre le texte et le compteur
-                colon_text = font.render(":", True, ball_colors[i])
-                colon_rect = colon_text.get_rect(
-                    center=(
-                        rect_x + rect_width // 2 + 17 + shake_x,
-                        rect_y + rect_height // 2 - 1 + shake_y,
-                    )
-                )
-
                 # Rendre le score de la balle
                 counter_text = font.render(
                     str(ball.circles_destroyed), True, ball_colors[i]
                 )
                 counter_rect = counter_text.get_rect(
                     center=(
-                        rect_x + rect_width // 2 + 40 + shake_x,
-                        rect_y + rect_height // 2 + shake_y,
+                        rect_x + rect_width // 2 + 45 + shake_x,
+                        rect_y + rect_height // 2 + 1 + shake_y,
                     )
                 )
 
                 # Afficher le texte, le ":" et le score dans le rectangle
                 screen.blit(text, text_rect)
-                screen.blit(colon_text, colon_rect)
                 screen.blit(counter_text, counter_rect)
     if len(circles) == 0:
         break

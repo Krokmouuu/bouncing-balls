@@ -50,12 +50,16 @@ class Ball:
         # Dessiner la traînée
         for i, (pos_x, pos_y) in enumerate(self.trail_positions):
             # Calculer l'alpha (transparence) en fonction de l'âge de la position
-            alpha = int(255 * (i / len(self.trail_positions)))
-            trail_color = (self.color)  # Couleur de la traînée avec transparence
-            
-            # Dessiner chaque point de la traînée
-            trail_radius = max(1, int(self.radius * (i / len(self.trail_positions))))
-            pygame.draw.circle(screen, trail_color, [int(pos_x), int(pos_y)], trail_radius)
+            alpha = int(150 * (1 - i / len(self.trail_positions)))  # Transparence réduite pour un effet plus subtil
+            trail_color = (*self.color[:3], alpha)  # Couleur de la traînée avec transparence
+
+            # Calculer un rayon plus petit pour les cercles plus anciens
+            trail_radius = max(1, int(self.radius * (1 - i / len(self.trail_positions) * 0.5)))
+
+            # Dessiner directement sur l'écran avec transparence
+            trail_surface = pygame.Surface((trail_radius * 2, trail_radius * 2), pygame.SRCALPHA)
+            pygame.draw.circle(trail_surface, trail_color, (trail_radius, trail_radius), trail_radius)
+            screen.blit(trail_surface, (int(pos_x - trail_radius), int(pos_y - trail_radius)))
 
         # Dessiner la boule principale
         if self.border_color and self.border_radius:

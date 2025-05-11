@@ -1,7 +1,7 @@
 import pygame
 import random
 import math
-
+from vaporization import Vaporization
 
 class Explosion:
     def __init__(self, x, y, radius, color):
@@ -10,7 +10,7 @@ class Explosion:
         self.initial_radius = radius
         self.radius = radius // 2  # Commence plus petit
         self.color = color
-        self.max_radius = radius * 3  # Grossit plus
+        self.max_radius = radius * 5  # Grossit plus
         self.growth_rate = radius * 0.1  # Taux de croissance proportionnel
         self.alpha = 255
         self.fade_rate = 5  # Plus lent

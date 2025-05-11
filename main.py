@@ -1,7 +1,7 @@
 import pygame
 from ball import Ball
 from circle import Circle
-from explosion import Explosion
+from explosion import Explosion, Vaporization
 import random
 from colors import colors
 import argparse
@@ -19,12 +19,6 @@ parser.add_argument(
     type=str,
     default="white",
     help="Couleur des cercles (nom de couleur)",
-)
-parser.add_argument(
-    "--explosion_color",
-    type=str,
-    default="red",
-    help="Couleur de l'explosion (nom de couleur)",
 )
 parser.add_argument(
     "--balls",
@@ -51,11 +45,25 @@ parser.add_argument(
     help="Texte à afficher sur la boule 3",
 )
 parser.add_argument(
-    "--title",
+    "--text4",
     type=str,
     default="",
-    help="Titre",
-),
+    help="Texte à afficher sur la boule 5",
+)
+parser.add_argument(
+    "--text5",
+    type=str,
+    default="",
+    help="Texte à afficher sur la boule 5",
+)
+(
+    parser.add_argument(
+        "--title",
+        type=str,
+        default="",
+        help="Titre",
+    ),
+)
 args = parser.parse_args()
 
 pygame.init()
@@ -66,14 +74,11 @@ screen.fill((0, 0, 0))
 clock = pygame.time.Clock()
 running = True
 
-TOTAL_FRAMES = 60 * 65
+TOTAL_FRAMES = 60 * 61
 
 position_ball_x = screen.get_width() // 2
 position_ball_y = screen.get_height() // 2
 radius_ball = 20
-color_ball = colors.get(
-    args.ball_color, (255, 255, 255)
-)  # Utilise la couleur spécifiée ou noir par défaut
 border_color_ball = (255, 255, 255)
 
 num_balls = int(args.balls)  # Nombre de balles
@@ -130,6 +135,7 @@ def resolve_ball_collision(ball1, ball2):
     ball2.velocity_x += p * ball1.radius * nx
     ball2.velocity_y += p * ball1.radius * ny
 
+
 def reset_ball(x_offset=0, ball_color=(255, 255, 255), text=""):
     """Créer une balle avec un décalage horizontal et une couleur spécifique."""
     return Ball(
@@ -145,7 +151,7 @@ def reset_ball(x_offset=0, ball_color=(255, 255, 255), text=""):
     )
 
 
-ball_texts = [args.text1, args.text2, args.text3]  # Textes des balles
+ball_texts = [args.text1, args.text2, args.text3, args.text4, args.text5]  # Textes des balles
 
 balls = [
     reset_ball(
@@ -159,8 +165,14 @@ balls = [
 position_circle_x = screen.get_width() // 2
 position_circle_y = screen.get_height() // 2
 thickness = 5
-start_radius = 200
-number_of_circles = 40
+if num_balls >= 4:
+    start_radius = 250
+    number_of_circles = 70
+elif num_balls == 1:
+    number_of_circles = 40
+else:
+    start_radius = 200
+    number_of_circles = 55
 circle_color = colors.get(args.circle_color, (0, 0, 0))  # Couleur des cercles
 
 
@@ -187,7 +199,7 @@ def generate_circles(number_of_circles, start_radius, gap):
 
 gap_between_circles = 30
 all_circles = generate_circles(number_of_circles, start_radius, gap_between_circles)
-circles = all_circles[:20]
+circles = all_circles[:15]
 next_circle_index = 20
 circles_to_remove = []
 
@@ -196,9 +208,6 @@ base_circle.min_radius = 100
 base_circle.shrink_rate = 0.1
 
 explosions = []
-explosion_color = colors.get(
-    args.explosion_color, (255, 0, 0)
-)  # Couleur des explosions
 
 start_time = pygame.time.get_ticks()  # Temps de départ en millisecondes
 for i in range(TOTAL_FRAMES):
@@ -244,12 +253,22 @@ for i in range(TOTAL_FRAMES):
         # Vérifier les collisions avec les cercles
         for circle in circles[:]:
             if circle.check_collision(ball):
+                # Ajouter une explosion
                 explosions.append(
                     Explosion(
                         circle.x,
                         circle.y,
                         circle.radius,
                         ball.color,
+                    )
+                )
+                # Ajouter une vaporisation
+                explosions.append(
+                    Vaporization(
+                        circle.x,
+                        circle.y,
+                        circle.radius,
+                        ball.color,  # Utiliser la couleur du cercle
                     )
                 )
                 circles.remove(circle)
@@ -326,15 +345,60 @@ for i in range(TOTAL_FRAMES):
     # Affichage du titre
     if args.title != "":
         text = font.render(args.title, True, (0, 0, 0))  # Texte en noir
-        rect_x = screen.get_width() // 2 - 150 # Position horizontale
-        rect_y = 100  # Position verticale
-        rect_width = 300 # Largeur
+        rect_x = screen.get_width() // 2 - 150  # Position horizontale
+        rect_y = 50  # Position verticale
+        rect_width = 350  # Largeur
         rect_height = 80  # Hauteur
-        pygame.draw.rect(screen, (255, 255, 255), (rect_x, rect_y, rect_width, rect_height))
+        pygame.draw.rect(
+            screen, (255, 255, 255), (rect_x, rect_y, rect_width, rect_height)
+        )
 
         font = pygame.font.Font(None, 40)  # Taille de la police
-        text_rect = text.get_rect(center=(rect_x + rect_width // 2, rect_y + rect_height // 2))
+        text_rect = text.get_rect(
+            center=(rect_x + rect_width // 2, rect_y + rect_height // 2)
+        )
         screen.blit(text, text_rect)
+
+    if len(balls) > 1:
+        # Afficher les rectangles pour 2 à 5 balles
+        total_width = len(balls[:5]) * 150  # Largeur totale des rectangles avec espacement
+        start_x = screen.get_width() // 2 - total_width // 2  # Point de départ pour centrer
+
+        for i, ball in enumerate(balls[:5]):  # Limiter à un maximum de 5 balles
+            if ball.text != "":
+                # Définir les dimensions et la position du rectangle
+                rect_x = start_x + i * 200  # Espacement horizontal entre les rectangles
+                rect_y = 150  # Position verticale sous le titre
+                rect_width = 150  # Largeur
+                rect_height = 50  # Hauteur
+
+                # Dessiner le rectangle de fond
+                pygame.draw.rect(
+                    screen, (255, 255, 255), (rect_x, rect_y, rect_width, rect_height)
+                )
+
+                # Rendre le texte de la balle
+                text = font.render(ball.text, True, ball_colors[i])
+                text_rect = text.get_rect(
+                    center=(rect_x + rect_width // 2 - 20, rect_y + rect_height // 2)
+                )
+
+                # Rendre le ":" entre le texte et le compteur
+                colon_text = font.render(":", True, ball_colors[i])
+                colon_rect = colon_text.get_rect(
+                    center=(rect_x + rect_width // 2 + 17, rect_y + rect_height // 2 - 1)
+                )
+
+                # Rendre le score de la balle
+                counter_text = font.render(str(ball.circles_destroyed), True, ball_colors[i])
+                counter_rect = counter_text.get_rect(
+                    center=(rect_x + rect_width // 2 + 40, rect_y + rect_height // 2)
+                )
+
+                # Afficher le texte, le ":" et le score dans le rectangle
+                screen.blit(text, text_rect)
+                screen.blit(colon_text, colon_rect)
+                screen.blit(counter_text, counter_rect)
 
     pygame.display.update()
 

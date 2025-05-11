@@ -279,6 +279,7 @@ for i in range(TOTAL_FRAMES):
                 )
                 circles.remove(circle)
                 ball.circles_destroyed += 1
+                ball.shake_frames = 4
                 if next_circle_index < len(all_circles):
                     circles.append(all_circles[next_circle_index])
                     next_circle_index += 1
@@ -382,23 +383,34 @@ for i in range(TOTAL_FRAMES):
                 rect_width = 150  # Largeur
                 rect_height = 50  # Hauteur
 
+                # Ajoutez un effet de "shake" si `shake_frames` est actif
+                if ball.shake_frames > 0:
+                    shake_x = random.randint(-5, 5)
+                    shake_y = random.randint(-5, 5)
+                    ball.shake_frames -= 1  # Réduisez le compteur de frames
+                else:
+                    shake_x = 0
+                    shake_y = 0
+
                 # Dessiner le rectangle de fond
                 pygame.draw.rect(
-                    screen, (255, 255, 255), (rect_x, rect_y, rect_width, rect_height)
+                    screen,
+                    (255, 255, 255),
+                    (rect_x + shake_x, rect_y + shake_y, rect_width, rect_height),
                 )
 
                 # Rendre le texte de la balle
                 text = font.render(ball.text, True, ball_colors[i])
                 text_rect = text.get_rect(
-                    center=(rect_x + rect_width // 2 - 20, rect_y + rect_height // 2)
+                    center=(rect_x + rect_width // 2 - 20 + shake_x, rect_y + rect_height // 2 + shake_y)
                 )
 
                 # Rendre le ":" entre le texte et le compteur
                 colon_text = font.render(":", True, ball_colors[i])
                 colon_rect = colon_text.get_rect(
                     center=(
-                        rect_x + rect_width // 2 + 17,
-                        rect_y + rect_height // 2 - 1,
+                        rect_x + rect_width // 2 + 17 + shake_x,
+                        rect_y + rect_height // 2 - 1 + shake_y,
                     )
                 )
 
@@ -407,7 +419,7 @@ for i in range(TOTAL_FRAMES):
                     str(ball.circles_destroyed), True, ball_colors[i]
                 )
                 counter_rect = counter_text.get_rect(
-                    center=(rect_x + rect_width // 2 + 40, rect_y + rect_height // 2)
+                    center=(rect_x + rect_width // 2 + 40 + shake_x, rect_y + rect_height // 2 + shake_y)
                 )
 
                 # Afficher le texte, le ":" et le score dans le rectangle

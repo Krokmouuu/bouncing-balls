@@ -31,6 +31,8 @@ class Ball:
         self.max_trail_length = 15
         self.text = text
         self.circles_destroyed = 0
+        self.shake_frames = 0
+
 
     def update(self, screen_width, screen_height):
         # Appliquer la gravité

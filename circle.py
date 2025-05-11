@@ -61,6 +61,8 @@ class Circle:
         self.angle += self.rotation_speed
 
     def check_collision(self, ball):
+        should_destroy = False
+        has_collided = False
         # Calculer la distance entre les centres
         dx = ball.x - self.x
         dy = ball.y - self.y
@@ -73,7 +75,7 @@ class Circle:
             < distance_sq
             < (self.radius + ball.radius) ** 2
         ):
-            return False
+            return should_destroy, has_collided
 
         distance = math.sqrt(distance_sq)
 
@@ -88,10 +90,12 @@ class Circle:
         else:
             in_gap = relative_angle >= gap_start or relative_angle <= gap_end
 
-        # === DESTRUCTION SI DANS LE TROU ===
+        
         if in_gap and distance > (self.radius - ball.radius * 1.8):
-            return True
-
+            should_destroy = True
+        elif abs(distance - self.radius) < ball.radius * 1.1:
+            has_collided = True
+        
         # Vérifier la collision avec le cercle extérieur
         if abs(distance - self.radius) < ball.radius * 1.1:
             # Calculer la position précédente relative
@@ -144,4 +148,4 @@ class Circle:
         if speed > ball.max_speed:
             ball.velocity_x = ball.velocity_x / speed * ball.max_speed
             ball.velocity_y = ball.velocity_y / speed * ball.max_speed
-        return False
+        return should_destroy, has_collided

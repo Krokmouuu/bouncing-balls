@@ -13,7 +13,7 @@ class Vaporization:
         self.create_particles()
 
     def create_particles(self):
-        for _ in range(150):  # Augmenter le nombre de particules pour un effet dense
+        for _ in range(200):  # Augmenter le nombre de particules pour un effet dense
             angle = random.uniform(0, 2 * math.pi)  # Angle autour du cercle
             distance = random.uniform(
                 self.radius * 0.9, self.radius * 1.1

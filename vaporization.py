@@ -26,7 +26,7 @@ class Vaporization:
                     "vx": random.uniform(-0.5, 0.5),  # Oscillation légère
                     "vy": random.uniform(-0.5, 0.5),  # Oscillation légère
                     "radius": size,
-                    "life": random.randint(30, 40),# Durée de vie des particules
+                    "life": random.randint(30, 40),  # Durée de vie des particules
                     "color": (
                         max(0, min(255, self.color[0] + random.randint(-20, 20))),
                         max(0, min(255, self.color[1] + random.randint(-20, 20))),

@@ -151,7 +151,13 @@ def reset_ball(x_offset=0, ball_color=(255, 255, 255), text=""):
     )
 
 
-ball_texts = [args.text1, args.text2, args.text3, args.text4, args.text5]  # Textes des balles
+ball_texts = [
+    args.text1,
+    args.text2,
+    args.text3,
+    args.text4,
+    args.text5,
+]  # Textes des balles
 
 balls = [
     reset_ball(
@@ -361,8 +367,12 @@ for i in range(TOTAL_FRAMES):
 
     if len(balls) > 1:
         # Afficher les rectangles pour 2 à 5 balles
-        total_width = len(balls[:5]) * 150  # Largeur totale des rectangles avec espacement
-        start_x = screen.get_width() // 2 - total_width // 2  # Point de départ pour centrer
+        total_width = (
+            len(balls[:5]) * 150
+        )  # Largeur totale des rectangles avec espacement
+        start_x = (
+            screen.get_width() // 2 - total_width // 2
+        )  # Point de départ pour centrer
 
         for i, ball in enumerate(balls[:5]):  # Limiter à un maximum de 5 balles
             if ball.text != "":
@@ -386,11 +396,16 @@ for i in range(TOTAL_FRAMES):
                 # Rendre le ":" entre le texte et le compteur
                 colon_text = font.render(":", True, ball_colors[i])
                 colon_rect = colon_text.get_rect(
-                    center=(rect_x + rect_width // 2 + 17, rect_y + rect_height // 2 - 1)
+                    center=(
+                        rect_x + rect_width // 2 + 17,
+                        rect_y + rect_height // 2 - 1,
+                    )
                 )
 
                 # Rendre le score de la balle
-                counter_text = font.render(str(ball.circles_destroyed), True, ball_colors[i])
+                counter_text = font.render(
+                    str(ball.circles_destroyed), True, ball_colors[i]
+                )
                 counter_rect = counter_text.get_rect(
                     center=(rect_x + rect_width // 2 + 40, rect_y + rect_height // 2)
                 )

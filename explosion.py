@@ -3,6 +3,7 @@ import random
 import math
 from vaporization import Vaporization
 
+
 class Explosion:
     def __init__(self, x, y, radius, color):
         self.x = x

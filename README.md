@@ -16,7 +16,7 @@ Une petite application ludique qui simule des balles rebondissantes à l'écran.
 Lance le programme avec les arguments suivants :
 
 ```
-python bouncing_balls.py --balls 3 --text1 "Hello" --text2 "World" --text3 "!" --title "Mon Jeu"
+python main.py --balls 3 --text1 "Hello" --text2 "World" --text3 "!" --title "Mon Jeu"
 ```
 # ⚙️ Arguments disponibles
 

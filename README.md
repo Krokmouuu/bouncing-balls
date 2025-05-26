@@ -49,6 +49,7 @@ Textes dynamiques : Chaque balle peut porter un message différent.
 Assure-toi d’avoir installé les bibliothèques nécessaires :
 
 ```
-pip install -r requirements.txt
+pip install pygame
+pip install mixer
 ```
 

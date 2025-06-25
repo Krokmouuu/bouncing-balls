@@ -52,4 +52,6 @@ Assure-toi d’avoir installé les bibliothèques nécessaires :
 pip install pygame
 pip install mixer
 ```
+![image](https://github.com/user-attachments/assets/b31d1c9f-1ed4-4331-baae-064f4c3469d6)
+
 
